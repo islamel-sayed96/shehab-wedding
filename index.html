@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>شهاب &amp; رحمة</title>
+<meta name="description" content="ندعوكم لحضور حفل زفاف شهاب ورحمة يوم الإثنين ١٩ أكتوبر ٢٠٢٦">
+<meta property="og:title" content="شهاب &amp; رحمة | Shehab &amp; Rahma">
+<meta property="og:description" content="ندعوكم لحضور حفل زفافنا يوم الإثنين ١٩ أكتوبر ٢٠٢٦">
+<meta name="theme-color" content="#b7773a">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Aref+Ruqaa&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Great+Vibes&display=swap">
+<link rel="preload" href="assets/js/app.js" as="script">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- Shared paint: gradients and symbols. Flower artwork is generated into #flora by the script. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs id="flora">
+    <radialGradient id="gWhite" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="48">
+      <stop offset="0" stop-color="#e6d3b1"/><stop offset=".35" stop-color="#f7eedd"/><stop offset=".8" stop-color="#fffdf8"/><stop offset="1" stop-color="#f6ecdb"/>
+    </radialGradient>
+    <radialGradient id="gBlush" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="46">
+      <stop offset="0" stop-color="#b98266"/><stop offset=".35" stop-color="#deb49b"/><stop offset=".75" stop-color="#f3dccb"/><stop offset="1" stop-color="#fbeee4"/>
+    </radialGradient>
+    <radialGradient id="gCore" cx="40%" cy="35%" r="70%">
+      <stop offset="0" stop-color="#fff2b8"/><stop offset=".6" stop-color="#d7b04f"/><stop offset="1" stop-color="#8e6c22"/>
+    </radialGradient>
+    <linearGradient id="gLeaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#cdd6b6"/><stop offset=".5" stop-color="#9fae80"/><stop offset="1" stop-color="#6f7f52"/>
+    </linearGradient>
+    <linearGradient id="gEuc" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9d3c0"/><stop offset="1" stop-color="#8b9f8a"/>
+    </linearGradient>
+    <linearGradient id="ringGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3d49c"/><stop offset=".5" stop-color="#b7773a"/><stop offset="1" stop-color="#f0cf93"/></linearGradient>
+    <linearGradient id="ringGold2" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9c68a"/><stop offset=".5" stop-color="#8a5524"/><stop offset="1" stop-color="#f3d49c"/></linearGradient>
+    <radialGradient id="gWax" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#e3a768"/><stop offset=".45" stop-color="#b7773a"/><stop offset=".85" stop-color="#7d4819"/><stop offset="1" stop-color="#5e3410"/>
+    </radialGradient>
+    <symbol id="heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></symbol>
+    <symbol id="heartGold" viewBox="0 0 24 24"><path fill="url(#ringGold2)" d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></symbol>
+    <symbol id="corner" viewBox="0 0 44 44"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M42 2H18c-8 0-12 4-12 12v28"/><path d="M36 8c-8 0-12 2-14 6-2-4 0-10 6-10M8 36c0-8 2-12 6-14-4-2-10 0-10 6"/><circle cx="16" cy="16" r="3" fill="currentColor"/></g></symbol>
+  </defs>
+</svg>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<!-- Intro: sealed envelope -->
+<div id="intro" role="dialog" aria-label="افتح الدعوة">
+  <div class="vignette"></div>
+  <div class="intro-inner">
+    <div class="intro-top">
+      <b><span data-c="groomEn"></span><i>&amp;</i><span data-c="brideEn"></span></b>
+      <span>دعوة زفاف</span>
+    </div>
+    <div class="env-stage" id="envStage">
+      <div class="envelope">
+        <div class="env-back"></div>
+        <div class="letter" aria-hidden="true">
+          <div class="bloom" style="top:-20px;right:-20px" data-cluster="small"></div>
+          <small>Together with their families</small>
+          <div class="ln"><span data-c="groomEn"></span><em>&amp;</em><span data-c="brideEn"></span></div>
+          <div class="ld" id="letterDate"></div>
+        </div>
+        <div class="env-front">
+          <div class="bloom" data-cluster="main"></div>
+          <div class="bloom b2 flip-x" data-cluster="small"></div>
+        </div>
+        <div class="env-flap"><div class="face outside"></div><div class="face liner"></div></div>
+        <button class="seal" id="sealBtn" type="button" aria-label="اضغط لفتح الدعوة">
+          <span class="seal-half l" data-seal></span>
+          <span class="seal-half r" data-seal></span>
+        </button>
+      </div>
+      <div class="env-shadow"></div>
+    </div>
+    <div class="intro-hint">اضغط على الختم لفتح الدعوة</div>
+  </div>
+</div>
+
+<button id="musicBtn" class="fab" type="button" aria-label="تشغيل الموسيقى" aria-pressed="false">
+  <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+</button>
+<button id="scrollBtn" class="fab" type="button" aria-label="إيقاف التمرير التلقائي">
+  <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
+  <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+</button>
+
+<main>
+  <!-- Hero -->
+  <section class="sec hero" id="top">
+    <div class="eyebrow rv">Welcome to our wedding</div>
+    <div class="frame rv" id="frame">
+      <svg class="frame-lines" aria-hidden="true"><path class="outer" pathLength="1"/><path class="outer" pathLength="1"/><path class="inner" pathLength="1"/><path class="inner" pathLength="1"/></svg>
+      <svg class="frame-crest" viewBox="0 0 130 56" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path pathLength="1" d="M65 6c-6 8-6 16 0 22 6-6 6-14 0-22z"/><path pathLength="1" d="M65 28c-10-6-22-4-26 6 8 4 16 0 20-6M65 28c10-6 22-4 26 6-8 4-16 0-20-6"/><path pathLength="1" d="M39 34c-10 0-20 4-28 12M91 34c10 0 20 4 28 12"/><path pathLength="1" d="M24 26c-6-4-12-2-14 4M106 26c6-4 12-2 14 4"/><circle pathLength="1" cx="65" cy="41" r="3"/></g></svg>
+      <div class="bloom tl" data-cluster="main" data-par=".06"></div>
+      <div class="bloom br flip-xy" data-cluster="main" data-par="-.05"></div>
+      <div class="bloom ml" data-cluster="small" data-par=".03"></div>
+      <p class="bismillah">بسم الله الرحمن الرحيم</p>
+      <p class="verse">﴿ وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً ﴾<cite>سورة الروم ٢١</cite></p>
+      <p class="invite-line">يتشرفان بدعوتكم لحضور حفل زفافهما</p>
+      <h1 class="names">
+        <span class="n foil" data-c="groom"></span>
+        <span class="amp">&amp;</span>
+        <span class="n foil" data-c="bride"></span>
+      </h1>
+      <p class="latin-names"><span data-c="groomEn"></span><i>&amp;</i><span data-c="brideEn"></span></p>
+    </div>
+    <a class="scroll-cue rv" href="#couple" style="--d:.3s">مرّر للأسفل<span></span></a>
+  </section>
+
+  <!-- Couple -->
+  <section class="sec" id="couple">
+    <div class="eyebrow rv">Ceremony info</div>
+    <div class="couple">
+      <div class="person rv"><strong data-c="groom"></strong><small>Groom</small><span>العريس</span></div>
+      <svg class="rings rv" viewBox="0 0 90 60" aria-hidden="true">
+        <circle class="r1" cx="34" cy="36" r="17"/><circle class="r2" cx="56" cy="36" r="17"/>
+        <path class="gem" d="M28 14l6-6 6 6-6 6z"/>
+        <path class="glint" d="M34 10l1 5 5 1-5 1-1 5-1-5-5-1 5-1z"/>
+      </svg>
+      <div class="person rv"><strong data-c="bride"></strong><small>Bride</small><span>العروسة</span></div>
+    </div>
+  </section>
+
+  <!-- Date + countdown + calendar -->
+  <section class="sec" id="date">
+    <div class="eyebrow rv">Save the date</div>
+    <h2 class="h2 rv foil">موعد الفرح</h2>
+    <div class="datebar rv">
+      <div class="side" id="dWeekday"></div>
+      <div class="day" id="dDay"></div>
+      <div class="side" id="dMonth"></div>
+    </div>
+    <div class="year rv" id="dYear"></div>
+    <div class="reception rv"><small>يبدأ الاستقبال الساعة</small><b id="vTime"></b></div>
+
+    <div class="orn rv"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#heart"/></svg></div>
+    <div class="eyebrow rv">Countdown</div>
+    <div class="count rv" id="count">
+      <div class="unit"><span class="num" id="cDays"><b>٠</b></span><small>يوم</small></div>
+      <div class="unit"><span class="num" id="cHours"><b>٠</b></span><small>ساعة</small></div>
+      <div class="unit"><span class="num" id="cMins"><b>٠</b></span><small>دقيقة</small></div>
+      <div class="unit"><span class="num" id="cSecs"><b>٠</b></span><small>ثانية</small></div>
+    </div>
+    <div class="count-done rv" id="countDone" hidden>اليوم يوم الفرح</div>
+
+    <div class="cal rv">
+      <svg class="corner c1"><use href="#corner"/></svg><svg class="corner c2"><use href="#corner"/></svg>
+      <svg class="corner c3"><use href="#corner"/></svg><svg class="corner c4"><use href="#corner"/></svg>
+      <p class="cal-title" id="calTitle"></p>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <a class="link-btn rv" id="calLink" href="#" target="_blank" rel="noopener">أضف الموعد للتقويم</a>
+  </section>
+
+  <!-- Venue -->
+  <section class="sec" id="venue">
+    <div class="eyebrow rv">Wedding reception venue</div>
+    <h2 class="h2 rv">مكان الحفل</h2>
+    <div class="paper rv">
+      <div class="bloom flip-x" style="top:-58px;left:-50px;width:130px;height:130px" data-cluster="small"></div>
+      <h3 class="h3"><span data-c="venueName"></span><small data-c="venueNameEn"></small></h3>
+      <p data-c="venueAddress"></p>
+      <div class="map" id="mapBox" hidden></div>
+      <div class="actions">
+        <a class="btn btn-main" id="mapLink" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5" fill="currentColor"/></svg>
+          افتح الخريطة
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RSVP -->
+  <section class="sec" id="rsvp">
+    <div class="eyebrow rv">Confirm attendance</div>
+    <h2 class="h2 rv foil">تأكيد الحضور</h2>
+    <p class="lead rv">يسعدنا تأكيد حضوركم قبل <span id="rsvpBy"></span></p>
+    <form class="rsvp rv" id="rsvpForm" novalidate>
+      <div class="field">
+        <label for="gName">الاسم</label>
+        <input id="gName" name="guestName" autocomplete="name" required>
+      </div>
+      <fieldset class="field">
+        <legend>هل ستحضر؟</legend>
+        <div class="choice">
+          <input type="radio" id="attYes" name="attend" value="yes" checked><label for="attYes">سأحضر بإذن الله</label>
+          <input type="radio" id="attNo" name="attend" value="no"><label for="attNo">أعتذر عن الحضور</label>
+        </div>
+      </fieldset>
+      <div class="field" id="guestsField">
+        <label for="gCount">عدد الحضور</label>
+        <select id="gCount" name="guests">
+          <option value="1">شخص واحد</option>
+          <option value="2">شخصان</option>
+          <option value="3">٣ أشخاص</option>
+          <option value="4">٤ أشخاص</option>
+          <option value="5">٥ أشخاص</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="gMsg">رسالة للعروسين (اختياري)</label>
+        <textarea id="gMsg" name="note" rows="3"></textarea>
+      </div>
+      <p class="form-err" id="formErr" hidden></p>
+      <button class="btn btn-main" id="rsvpSubmit" type="submit">إرسال التأكيد</button>
+    </form>
+    <div class="rsvp-done" id="rsvpDone" hidden>
+      <svg class="ok" viewBox="0 0 52 52" aria-hidden="true"><path pathLength="1" fill="none" stroke="currentColor" stroke-width="2" d="M26 3a23 23 0 1 1 0 46 23 23 0 1 1 0-46M15 27l8 8 15-17"/></svg>
+      <p id="rsvpThanks"></p>
+      <div class="actions" id="rsvpAlt" hidden>
+        <a class="btn btn-main" id="waLink" href="#" target="_blank" rel="noopener">إرسال الرد عبر واتساب</a>
+      </div>
+      <div class="actions"><button class="btn btn-line" id="rsvpEdit" type="button">تعديل الرد</button></div>
+    </div>
+  </section>
+
+  <!-- Closing -->
+  <section class="sec closing">
+    <div class="orn rv"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#heart"/></svg></div>
+    <p class="dua rv foil">بارك الله لهما، وبارك عليهما، وجمع بينهما في خير</p>
+    <div class="hashtag rv" data-c="hashtag"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="mono" data-c="mono"></div>
+  <div>بانتظاركم لتكتمل فرحتنا</div>
+</footer>
+
+<script src="assets/js/config.js" defer></script>
+<script src="assets/js/app.js" defer></script>
+</body>
+</html>
