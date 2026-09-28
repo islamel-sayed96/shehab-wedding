@@ -12,6 +12,8 @@
 | `assets/js/app.js` | الحركات، الظرف، الموسيقى، العداد، تأكيد الحضور |
 | `assets/audio/song.mp3` | الأغنية (ارفعها بالاسم ده) |
 | `favicon.svg`, `apple-touch-icon.png` | أيقونة الدعوة |
+| `og-image.jpg` | صورة الدعوة اللي بتظهر فوق اللينك في واتساب وفيسبوك وتليجرام (1200×630) |
+| `assets/img/` | ملمس الورق |
 
 ## التعديل
 
@@ -26,3 +28,12 @@
 
 Settings ← Pages ← Deploy from a branch ← `main` و `/ (root)` ← Save.
 اللينك: `https://islamel-sayed96.github.io/shehab-wedding/`
+
+## مشاركة اللينك
+
+لما تبعت اللينك على واتساب هيظهر كارت فيه صورة الدعوة والعنوان والوصف.
+واتساب بيحفظ المعاينة، فلو بعت اللينك قبل كده وظهر من غير صورة، ابعته المرة دي كده عشان يعيد القراءة:
+
+```
+https://islamel-sayed96.github.io/shehab-wedding/?v=2
+```

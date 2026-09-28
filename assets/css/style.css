@@ -16,8 +16,8 @@
     --f-body: "Amiri", "Traditional Arabic", "Times New Roman", serif;
     --f-script: "Great Vibes", "Snell Roundhand", cursive;
     --f-latin: "Cormorant Garamond", "Garamond", Georgia, serif;
-    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .3 0 0 0 0 .16 0 0 0 .11 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
-    --fibers: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .09' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .4 0 0 0 0 .22 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23f)'/%3E%3C/svg%3E");
+    --grain: url("../img/grain.png");
+    --fibers: url("../img/fibers.png");
     --damask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='160' viewBox='0 0 120 160'%3E%3Cg fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M60 18c-10 14-10 30 0 42 10-12 10-28 0-42z'/%3E%3Cpath d='M60 60c-18-4-34 6-36 22 12 2 24-6 26-18M60 60c18-4 34 6 36 22-12 2-24-6-26-18'/%3E%3Cpath d='M60 60v44M48 118c0-10 6-14 12-14s12 4 12 14M36 96c-14 6-18 22-8 30M84 96c14 6 18 22 8 30'/%3E%3Cpath d='M24 82c-10-2-18 4-18 12s8 10 12 6M96 82c10-2 18 4 18 12s-8 10-12 6'/%3E%3Ccircle cx='60' cy='128' r='4'/%3E%3Ccircle cx='0' cy='0' r='6'/%3E%3Ccircle cx='120' cy='0' r='6'/%3E%3Ccircle cx='0' cy='160' r='6'/%3E%3Ccircle cx='120' cy='160' r='6'/%3E%3C/g%3E%3C/svg%3E");
   }
   * { box-sizing: border-box; }
@@ -313,6 +313,10 @@
   .paper p { margin: 8px 0 0; color: var(--ink-dim); }
   .map { margin-top: 18px; border-radius: 12px; overflow: hidden; aspect-ratio: 4 / 3; max-width: 100%; border: 1px solid rgba(200,162,94,.5); background: var(--paper-2); }
   .map iframe { width: 100%; height: 100%; border: 0; display: block; }
+  .map-load { width: 100%; height: 100%; border: 0; cursor: pointer; display: grid; place-content: center; justify-items: center; gap: 6px; color: var(--caramel-lo); font-size: 17px;
+    background: var(--grain), repeating-linear-gradient(45deg, rgba(183,119,58,.06) 0 2px, transparent 2px 22px), repeating-linear-gradient(-45deg, rgba(123,134,81,.06) 0 2px, transparent 2px 22px), var(--paper-2); }
+  .map-load svg { width: 40px; height: 40px; color: var(--caramel); animation: bob 2s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-6px); } }
   .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
   .btn {
     position: relative; overflow: hidden;

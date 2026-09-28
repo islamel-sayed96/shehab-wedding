@@ -180,12 +180,18 @@
     "&dates=" + gcal(when) + "/" + gcal(end) +
     "&location=" + encodeURIComponent(`${CONFIG.venueNameEn} - ${CONFIG.venueAddress}`) +
     "&details=" + encodeURIComponent("بكل الحب ندعوكم لمشاركتنا فرحتنا");
-  // Embedded map where the host allows frames (the claude.ai preview does not).
+  // Embedded map, loaded only when the guest taps it: Google Maps is by far the heaviest thing on the page.
   if (CONFIG.mapEmbed && !/claude|anthropic/i.test(location.hostname)) {
-    const f = document.createElement("iframe");
-    f.src = CONFIG.mapEmbed; f.loading = "lazy"; f.title = "خريطة مكان الحفل";
-    f.referrerPolicy = "no-referrer-when-downgrade";
-    $("#mapBox").appendChild(f); $("#mapBox").hidden = false;
+    const box = $("#mapBox"), btn = document.createElement("button");
+    btn.type = "button"; btn.className = "map-load";
+    btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22s-7-6.4-7-12a7 7 0 0 1 14 0c0 5.6-7 12-7 12z"/><circle cx="12" cy="10" r="2.6" fill="#fcf9f2"/></svg><span>اضغط لعرض الخريطة هنا</span>';
+    btn.addEventListener("click", () => {
+      const f = document.createElement("iframe");
+      f.src = CONFIG.mapEmbed; f.title = "خريطة مكان الحفل";
+      f.referrerPolicy = "no-referrer-when-downgrade";
+      box.replaceChildren(f);
+    }, { once: true });
+    box.appendChild(btn); box.hidden = false;
   }
 
   /* Arch frame lines drawn from the crest outwards, sized to the frame */
