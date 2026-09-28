@@ -284,138 +284,160 @@
   });
   $("#rsvpEdit").addEventListener("click", () => { $("#rsvpDone").hidden = true; form.hidden = false; });
 
-  /* ════════ Built-in music: an original Egyptian zaffa in maqam Hijaz ════════
-     Qanun melody with tremolo, oud bass, darbuka on the maqsum rhythm and riq.
-     All instruments are synthesised (Karplus–Strong strings, noise percussion). */
-  const Zaffa = (() => {
+  /* ════════ Built-in music: an original romantic ballad in maqam Nahawand ════════
+     A bowed, violin-like lead with vibrato over a warm string pad, oud arpeggios,
+     qanun ornaments and a soft bendir. All instruments are synthesised
+     (Karplus–Strong strings, detuned oscillators, filtered noise). */
+  const Ballad = (() => {
     let playing = false;
     let ctx, master, dry, rev, noise, timer, next = 0, step = 0;
-    const E = 0.29;                                 // eighth note (~103 bpm)
+    const B = 0.9;                                  // one beat (~66 bpm)
     const hz = m => 440 * Math.pow(2, (m - 69) / 12);
-    // Hijaz on D: D Eb F# G A Bb C D  (62 63 66 67 69 70 72 74)
-    const PH = {
-      A: [[69,2],[70,1],[69,1],[67,1],[66,1],[67,2], [69,3],[67,1],[66,1],[63,1],[62,2]],
-      B: [[62,1],[66,1],[67,1],[69,1],[70,2],[69,2], [72,1],[70,1],[69,1],[67,1],[69,4]],
-      C: [[74,2],[72,1],[70,1],[69,2],[70,1],[72,1], [70,1],[69,1],[67,1],[66,1],[67,2],[69,2]],
-      D: [[67,1],[66,1],[63,1],[66,1],[67,2],[66,1],[63,1], [62,6],[0,2]]
+    // Chords as [bass, three upper voices]
+    const CH = {
+      Dm: [38, 57, 62, 65], Bb: [46, 58, 62, 65], Gm: [43, 55, 58, 62], A7: [45, 57, 61, 67],
+      F: [41, 57, 60, 65], C: [48, 55, 60, 64], A: [45, 57, 61, 64]
     };
-    const BASS = { A: [50, 50], B: [50, 48], C: [55, 48], D: [55, 50] };
-    const ORDER = ["A", "B", "A", "D", "C", "B", "C", "D"];
-    const song = {}, bassline = [];
-    let pos0 = 0;
-    ORDER.forEach(k => {
-      let p = pos0;
-      PH[k].forEach(([m, l]) => { if (m) song[p] = [m, l]; p += l; });
-      bassline.push(...BASS[k]);
-      pos0 += 16;
-    });
-    const LEN = pos0, INTRO = 8;
+    const PROG = ["Dm","Bb","Gm","A7", "Dm","F","Gm","A", "F","C","Dm","A", "Gm","Dm","A","Dm"];
+    // Melody per bar as [midi, beats]
+    const MEL = [
+      [[69,2],[74,1],[76,1]], [[77,3],[76,1]], [[74,2],[70,1],[72,1]], [[69,4]],
+      [[69,1],[74,1],[77,1],[81,1]], [[79,2],[77,1],[76,1]], [[77,1.5],[76,.5],[74,1],[70,1]], [[73,2],[76,2]],
+      [[81,2],[79,1],[77,1]], [[76,2],[79,2]], [[77,1],[76,1],[74,1],[77,1]], [[76,4]],
+      [[74,1],[79,1],[82,2]], [[81,2],[77,1],[74,1]], [[76,1],[73,1],[76,1],[79,1]], [[74,4]]
+    ];
+    const INTRO = 2;                                // two bars of pad and oud before the melody
     const cache = {};
 
     function pluckBuf(m, dark) {
       const key = m + (dark ? "d" : "b");
       if (cache[key]) return cache[key];
       const sr = ctx.sampleRate, f = hz(m), N = Math.max(2, Math.round(sr / f));
-      const dur = dark ? 1.6 : 2.2, len = Math.floor(sr * dur);
+      const len = Math.floor(sr * (dark ? 2.2 : 2.6));
       const buf = ctx.createBuffer(1, len, sr), d = buf.getChannelData(0);
       let prev = 0;
-      for (let i = 0; i < N; i++) { const r = Math.random() * 2 - 1; d[i] = dark ? (prev = prev * .55 + r * .45) : r; }
-      const damp = dark ? .993 : .9975;
+      for (let i = 0; i < N; i++) { const r = Math.random() * 2 - 1; d[i] = dark ? (prev = prev * .6 + r * .4) : r; }
+      const damp = dark ? .995 : .998;
       for (let i = N; i < len; i++) d[i] = damp * .5 * (d[i - N] + (i - N - 1 >= 0 ? d[i - N - 1] : 0));
       let peak = 0; for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(d[i]));
       for (let i = 0; i < len; i++) d[i] /= peak || 1;
       return (cache[key] = buf);
     }
-    function pluck(m, t, vel, dark, pan = 0) {
+    function pan(node, v) {
+      if (!ctx.createStereoPanner) return node;
+      const p = ctx.createStereoPanner(); p.pan.value = v; node.connect(p); return p;
+    }
+    function pluck(m, t, vel, dark, pv = 0) {
       const src = ctx.createBufferSource(); src.buffer = pluckBuf(m, dark);
+      const f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = dark ? 1500 : 4200;
       const g = ctx.createGain(); g.gain.value = vel;
-      const f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = dark ? 1800 : 5200;
-      const p = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-      src.connect(f); f.connect(g);
-      if (p) { p.pan.value = pan; g.connect(p); out(p); } else out(g);
+      src.connect(f); f.connect(g); out(pan(g, pv), .45);
       src.start(t);
     }
-    function nz(t, dur, type, freq, q, vel) {
-      const s = ctx.createBufferSource(); s.buffer = noise;
-      const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q;
+    // Bowed lead: detuned saws, a scoop into pitch, delayed vibrato and a little bow noise
+    function bow(m, t, dur, vel) {
+      const f = hz(m), end = t + dur;
       const g = ctx.createGain();
-      g.gain.setValueAtTime(vel, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      s.connect(f); f.connect(g); out(g, .15);
-      s.start(t, Math.random() * .5); s.stop(t + dur + .02);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vel, t + .22);
+      g.gain.setValueAtTime(vel, Math.max(t + .22, end - .15));
+      g.gain.linearRampToValueAtTime(0, end + .5);
+      const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.Q.value = .7;
+      lp.frequency.setValueAtTime(1400, t); lp.frequency.linearRampToValueAtTime(2600, t + .4);
+      const vib = ctx.createOscillator(), vg = ctx.createGain();
+      vib.frequency.value = 5.2;
+      vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * .006, t + .45);
+      vib.connect(vg);
+      [-6, 5].forEach(det => {
+        const o = ctx.createOscillator(); o.type = "sawtooth";
+        o.frequency.setValueAtTime(f * .985, t); o.frequency.exponentialRampToValueAtTime(f, t + .12);
+        o.detune.value = det; vg.connect(o.frequency);
+        o.connect(lp); o.start(t); o.stop(end + .6);
+      });
+      vib.start(t); vib.stop(end + .6);
+      lp.connect(g); out(pan(g, .12), .6);
+      // bow hiss
+      const s = ctx.createBufferSource(); s.buffer = noise;
+      const bf = ctx.createBiquadFilter(); bf.type = "bandpass"; bf.frequency.value = f * 3; bf.Q.value = 2;
+      const ng = ctx.createGain();
+      ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(vel * .05, t + .1); ng.gain.linearRampToValueAtTime(0, t + .5);
+      s.connect(bf); bf.connect(ng); out(ng, .5); s.start(t, Math.random() * .5); s.stop(t + .55);
     }
-    function dum(t, v) {
+    function pad(notes, t, dur) {
+      const g = ctx.createGain(), lp = ctx.createBiquadFilter();
+      lp.type = "lowpass"; lp.frequency.value = 950;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(.035, t + 1.1);
+      g.gain.setValueAtTime(.035, t + dur - .2);
+      g.gain.linearRampToValueAtTime(0, t + dur + 1.2);
+      notes.forEach(m => [-8, 0, 7].forEach(det => {
+        const o = ctx.createOscillator(); o.type = "sawtooth";
+        o.frequency.value = hz(m); o.detune.value = det;
+        o.connect(lp); o.start(t); o.stop(t + dur + 1.3);
+      }));
+      lp.connect(g); out(pan(g, -.1), .7);
+    }
+    function bendir(t, v) {
       const o = ctx.createOscillator(), g = ctx.createGain();
-      o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(62, t + .16);
-      g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + .5);
-      o.connect(g); out(g, .1); o.start(t); o.stop(t + .52);
-      nz(t, .05, "lowpass", 500, .7, v * .5);
+      o.frequency.setValueAtTime(95, t); o.frequency.exponentialRampToValueAtTime(52, t + .25);
+      g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + .7);
+      o.connect(g); out(g, .3); o.start(t); o.stop(t + .72);
     }
-    function tak(t, v) {
-      nz(t, .09, "bandpass", 3200, .9, v);
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.frequency.setValueAtTime(1150, t); o.frequency.exponentialRampToValueAtTime(700, t + .04);
-      g.gain.setValueAtTime(v * .35, t); g.gain.exponentialRampToValueAtTime(0.0001, t + .05);
-      o.connect(g); out(g, .1); o.start(t); o.stop(t + .06);
+    function shimmer(t, v) {
+      const s = ctx.createBufferSource(); s.buffer = noise;
+      const f = ctx.createBiquadFilter(); f.type = "highpass"; f.frequency.value = 7000;
+      const g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + .35);
+      s.connect(f); f.connect(g); out(pan(g, .3), .5); s.start(t, Math.random() * .5); s.stop(t + .4);
     }
-    function riq(t, v) { nz(t, .14, "highpass", 6500, .5, v); nz(t, .1, "bandpass", 9500, 3, v * .6); }
-
     function init() {
       const AC = window.AudioContext || window.webkitAudioContext;
       ctx = new AC();
       master = ctx.createGain(); master.gain.value = 0;
       const comp = ctx.createDynamicsCompressor();
       master.connect(comp); comp.connect(ctx.destination);
-      dry = ctx.createGain(); dry.gain.value = .9; dry.connect(master);
+      dry = ctx.createGain(); dry.gain.value = .8; dry.connect(master);
       rev = ctx.createConvolver();
-      const len = ctx.sampleRate * 2.2, ir = ctx.createBuffer(2, len, ctx.sampleRate);
-      for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.5); }
+      const len = ctx.sampleRate * 3.6, ir = ctx.createBuffer(2, len, ctx.sampleRate);
+      for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
       rev.buffer = ir;
-      const wet = ctx.createGain(); wet.gain.value = .32; rev.connect(wet); wet.connect(master);
+      const wet = ctx.createGain(); wet.gain.value = .42; rev.connect(wet); wet.connect(master);
       noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
       const nd = noise.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
     }
-    function out(node, send = .35) {
+    function out(node, send = .4) {
       node.connect(dry);
       if (send) { const s = ctx.createGain(); s.gain.value = send; node.connect(s); s.connect(rev); }
     }
+    // One step = one bar of four beats
     function schedule() {
-      while (next < ctx.currentTime + .35) {
-        const t = next;
-        if (step < INTRO) {
-          // Opening darbuka roll that swells into the zaffa
-          const v = .25 + step / INTRO * .5;
-          if (step === 0) dum(t, .8);
-          tak(t, v); tak(t + E / 2, v * .8);
-          if (step === INTRO - 1) { dum(t, .9); riq(t, .4); }
-        } else {
-          const pos = (step - INTRO) % LEN, loop = Math.floor((step - INTRO) / LEN), slot = pos % 8, bar = Math.floor(pos / 8);
-          // Maqsum: DUM tak . tak DUM . tak .
-          if (slot === 0 || slot === 4) dum(t, slot === 0 ? .85 : .7);
-          if (slot === 1 || slot === 3 || slot === 6) tak(t, .45);
-          if (slot === 2 || slot === 5 || slot === 7) tak(t, .14);
-          riq(t, slot % 2 ? .16 : .08);
-          if (slot === 7 && bar % 4 === 3) { tak(t + E / 2, .3); }
-          // Oud bass
-          const root = bassline[bar];
-          if (slot === 0) pluck(root, t, .5, true, -.2);
-          if (slot === 3) pluck(root + 7, t, .28, true, -.2);
-          if (slot === 4) pluck(root + 12, t, .32, true, -.2);
-          if (slot === 6) pluck(root + 7, t, .24, true, -.2);
-          // Qanun melody (tremolo on long notes), doubled by oud on alternate passes
-          const n = song[pos];
-          if (n) {
-            const [m, l] = n;
-            if (l >= 3) {
-              const hits = l * 2;
-              for (let k = 0; k < hits; k++) pluck(m, t + k * E / 2, .42 * (1 - k / hits * .5), false, .25);
+      while (next < ctx.currentTime + 1) {
+        const t = next, bar = step < INTRO ? step % 2 === 0 ? 0 : 1 : (step - INTRO) % 16;
+        const loop = step < INTRO ? -1 : Math.floor((step - INTRO) / 16);
+        const ch = CH[PROG[bar]];
+        pad(ch.slice(1), t, B * 4);
+        // Oud: low root, then a rolling arpeggio in eighths
+        pluck(ch[0] + 12, t, .5, true, -.25);
+        [1, 2, 3, 2, 1, 2, 3, 2].forEach((k, i) => { if (i) pluck(ch[k], t + i * B / 2, .16 + (i === 4 ? .06 : 0), true, -.25); });
+        if (step >= INTRO) {
+          bendir(t, .32); bendir(t + B * 2, .18);
+          shimmer(t + B, .03); shimmer(t + B * 3, .03);
+          let bt = t;
+          MEL[bar].forEach(([m, beats]) => {
+            const d = beats * B;
+            if (loop % 2 === 0) {
+              bow(m, bt, d * .96, .09);
             } else {
-              pluck(m, t, .55, false, .25);
-              if (l === 2) pluck(m + 12, t + E, .12, false, .35);
+              // Second pass: qanun carries the tune, bowed line an octave lower underneath
+              if (beats >= 2) for (let k = 0; k < beats * 4; k++) pluck(m, bt + k * B / 4, .3 * (1 - k / (beats * 4) * .55), false, .3);
+              else pluck(m, bt, .42, false, .3);
+              bow(m - 12, bt, d * .96, .05);
             }
-            if (loop % 2 === 1) pluck(m - 12, t, .3, true, -.1);
-          }
+            bt += d;
+          });
+          // Qanun grace notes at the end of each four-bar phrase
+          if (bar % 4 === 3) [0, 1, 2].forEach(i => pluck(ch[3] + 12 + i * 3, t + B * 3 + i * B / 6, .12, false, .35));
         }
-        next += E; step++;
+        next += B * 4; step++;
       }
     }
     return {
@@ -427,9 +449,9 @@
           ctx.resume();
           if (!playing) {
             next = Math.max(next, ctx.currentTime + .1);
-            schedule(); timer = setInterval(schedule, 80);
+            schedule(); timer = setInterval(schedule, 200);
             master.gain.cancelScheduledValues(ctx.currentTime);
-            master.gain.setTargetAtTime(.8, ctx.currentTime, .5);
+            master.gain.setTargetAtTime(.85, ctx.currentTime, 1.2);
             playing = true;
           }
         } catch (e) { playing = false; }
@@ -437,21 +459,22 @@
       },
       pause() {
         if (!ctx) return;
-        master.gain.setTargetAtTime(0, ctx.currentTime, .2);
+        master.gain.setTargetAtTime(0, ctx.currentTime, .3);
         clearInterval(timer); playing = false; sync();
-        setTimeout(() => { if (!playing) { ctx.suspend(); next = 0; } }, 1000);
+        setTimeout(() => { if (!playing) { ctx.suspend(); next = 0; } }, 1400);
       },
       get playing() { return playing; }
     };
   })();
-  /* The song file from config plays first; if it is missing or can't play, the zaffa takes over. */
+
+  /* The song file from config plays first; if it is missing or can't play, the built-in ballad takes over. */
   const Music = (() => {
     let audio = null, useSynth = !CONFIG.musicUrl, playing = false, want = false, fade;
     const fallback = () => {
       if (useSynth) return;
       useSynth = true; playing = false;
       if (audio) { audio.pause(); audio.removeAttribute("src"); }
-      if (want) Zaffa.play(); else sync();
+      if (want) Ballad.play(); else sync();
     };
     if (!useSynth) {
       audio = new Audio();
@@ -462,8 +485,8 @@
     return {
       play() {
         want = true;
-        if (useSynth) { Zaffa.play(); return; }
-        Zaffa.prime();
+        if (useSynth) { Ballad.play(); return; }
+        Ballad.prime();
         audio.play().then(() => {
           playing = true; sync();
           clearInterval(fade);
@@ -472,10 +495,10 @@
       },
       pause() {
         want = false;
-        if (useSynth) { Zaffa.pause(); return; }
+        if (useSynth) { Ballad.pause(); return; }
         clearInterval(fade); audio.pause(); audio.volume = 0; playing = false; sync();
       },
-      get playing() { return useSynth ? Zaffa.playing : playing; }
+      get playing() { return useSynth ? Ballad.playing : playing; }
     };
   })();
   const mBtn = $("#musicBtn");
