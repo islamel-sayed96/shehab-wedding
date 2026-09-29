@@ -486,6 +486,14 @@
       audio = new Audio();
       audio.loop = true; audio.preload = "auto"; audio.volume = 0;
       audio.addEventListener("error", fallback);
+      // Optional segment: start at musicStart seconds and loop back there at musicEnd.
+      const from = +CONFIG.musicStart || 0, to = +CONFIG.musicEnd || 0;
+      if (from || to) {
+        audio.loop = !to;
+        audio.addEventListener("loadedmetadata", () => { if (from && audio.currentTime < from) audio.currentTime = from; });
+        audio.addEventListener("timeupdate", () => { if (to && audio.currentTime >= to) audio.currentTime = from; });
+        audio.addEventListener("ended", () => { audio.currentTime = from; audio.play().catch(() => {}); });
+      }
       audio.src = CONFIG.musicUrl;
     }
     return {
