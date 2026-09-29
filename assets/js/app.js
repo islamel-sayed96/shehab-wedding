@@ -266,7 +266,7 @@
     const btn = $("#rsvpSubmit"), label = btn.textContent;
     btn.disabled = true; btn.textContent = "جارٍ الإرسال…";
     try {
-      const res = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(CONFIG.rsvpEmail), {
+      const res = await fetch("https://formsubmit.co/ajax/" + CONFIG.rsvpEmail.trim(), {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({

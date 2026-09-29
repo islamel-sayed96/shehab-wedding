@@ -14,12 +14,12 @@ const CONFIG = {
   rsvpBy: "2026-10-12T00:00:00+03:00",
   venueName: "قاعات حياة للحفلات",
   venueNameEn: "Hayat Banquet Halls",
-  venueAddress: "شارع مصطفى كامل، بجوار ترعة البرنس",
+  venueAddress: "شارع مصطفى كامل، بعد قسم ثالث المنتزه، أمام شارع الملك",
   mapUrl: "https://www.google.com/maps/search/?api=1&query=Hayat+Banquet+Halls",
   mapEmbed: "https://www.google.com/maps?q=Hayat+Banquet+Halls&output=embed",
   // الإيميل اللي هتوصله ردود الضيوف ورسائلهم (عن طريق خدمة FormSubmit المجانية).
   // أول رد هيوصلك إيميل تفعيل من FormSubmit، اضغط Activate مرة واحدة بس.
-  rsvpEmail: "",
+  rsvpEmail: "Shehabahmed123@icloud.com",
   // رقم واتساب احتياطي بالصيغة الدولية بدون + (يُستخدم لو الإيميل مش متسجل أو الإرسال فشل)
   whatsapp: "",
   hashtag: "#Shehab_Rahma",
