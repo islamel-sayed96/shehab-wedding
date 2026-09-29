@@ -265,29 +265,68 @@
     }
     const btn = $("#rsvpSubmit"), label = btn.textContent;
     btn.disabled = true; btn.textContent = "جارٍ الإرسال…";
+    const slow = setTimeout(() => { btn.textContent = "لحظات، بنوصّل ردك…"; }, 4000);
+    const payload = {
+      _subject: `${yes ? "تأكيد حضور" : "اعتذار"}: ${name} — زفاف ${CONFIG.groom} و${CONFIG.bride}`,
+      _template: "table", _captcha: "false",
+      "الاسم": name,
+      "الحضور": yes ? "سأحضر بإذن الله" : "أعتذر عن الحضور",
+      "عدد الحضور": count,
+      "رسالة للعروسين": msg || "—"
+    };
     try {
-      const res = await fetch("https://formsubmit.co/ajax/" + CONFIG.rsvpEmail.trim(), {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          _subject: `${yes ? "تأكيد حضور" : "اعتذار"}: ${name} — زفاف ${CONFIG.groom} و${CONFIG.bride}`,
-          _template: "table", _captcha: "false",
-          "الاسم": name,
-          "الحضور": yes ? "سأحضر بإذن الله" : "أعتذر عن الحضور",
-          "عدد الحضور": count,
-          "رسالة للعروسين": msg || "—"
-        })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || String(data.success) === "false") throw new Error(data.message || res.status);
+      await sendRsvp(payload);
       showDone(name, yes, true);
     } catch (e2) {
       if (CONFIG.whatsapp) showDone(name, yes, false, waText);
-      else err("تعذّر الإرسال الآن. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.");
+      else err(/activat/i.test(e2.message || "")
+        ? "استقبال الردود لسه بيتفعّل، جرّب تاني بعد شوية."
+        : "تعذّر الإرسال الآن. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.");
     } finally {
+      clearTimeout(slow);
       btn.disabled = false; btn.textContent = label;
     }
   });
+
+  // FormSubmit's JSON endpoint first, capped at 10 s so the button can never hang.
+  // If it times out or the network call itself fails, post a plain form into a hidden
+  // frame instead: that path needs no reply, so the guest isn't kept waiting.
+  async function sendRsvp(payload) {
+    const email = CONFIG.rsvpEmail.trim();
+    const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 10000);
+    let res;
+    try {
+      res = await fetch("https://formsubmit.co/ajax/" + email, {
+        method: "POST", signal: ctrl.signal,
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      return postViaFrame("https://formsubmit.co/" + email, payload);
+    } finally {
+      clearTimeout(timer);
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || String(data.success) === "false") throw new Error(data.message || String(res.status));
+  }
+  function postViaFrame(action, payload) {
+    return new Promise(resolve => {
+      const name = "rsvp-" + Date.now();
+      const frame = document.createElement("iframe");
+      frame.name = name; frame.hidden = true; frame.title = "rsvp";
+      const f = document.createElement("form");
+      f.method = "POST"; f.action = action; f.target = name; f.hidden = true; f.acceptCharset = "UTF-8";
+      Object.entries(payload).forEach(([k, v]) => {
+        const i = document.createElement("input"); i.type = "hidden"; i.name = k; i.value = v; f.appendChild(i);
+      });
+      document.body.append(frame, f);
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); setTimeout(() => { frame.remove(); f.remove(); }, 1000); } };
+      frame.addEventListener("load", finish);
+      setTimeout(finish, 5000);
+      f.submit();
+    });
+  }
   $("#rsvpEdit").addEventListener("click", () => { $("#rsvpDone").hidden = true; form.hidden = false; });
 
   /* ════════ Built-in music: an original romantic ballad in maqam Nahawand ════════
