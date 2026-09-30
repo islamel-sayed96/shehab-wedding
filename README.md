@@ -11,6 +11,10 @@
 | `assets/css/style.css` | الألوان والشكل |
 | `assets/js/app.js` | الحركات، الظرف، الموسيقى، العداد، تأكيد الحضور |
 | `assets/audio/song.mp3` | الأغنية (ارفعها بالاسم ده) |
+| `api/wishes.php` | حفظ الردود ورسائل التهنئة وعرضها في الموقع (PHP) |
+| `api/admin.php` | صفحة متابعة الحضور للعروسين |
+| `api/config.sample.php` | نموذج ملف الإعدادات (كلمة سر صفحة المتابعة) |
+| `.htaccess` | ضغط الملفات والكاش على هوستنجر |
 | `favicon.svg`, `apple-touch-icon.png` | أيقونة الدعوة |
 | `og-image.jpg` | صورة الدعوة اللي بتظهر فوق اللينك في واتساب وفيسبوك وتليجرام (1200×630) |
 | `assets/img/` | ملمس الورق |
@@ -37,3 +41,21 @@ Settings ← Pages ← Deploy from a branch ← `main` و `/ (root)` ← Save.
 ```
 https://islamel-sayed96.github.io/shehab-wedding/?v=2
 ```
+
+## الرفع على هوستنجر
+
+رسائل التهنئة وصفحة المتابعة محتاجين PHP، فبيشتغلوا على هوستنجر بس (مش GitHub Pages).
+على GitHub Pages الموقع بيشتغل عادي، وقسم رسائل التهنئة بيستخبى، والردود بتروح على الإيميل.
+
+1. **hPanel → Websites → Manage → Advanced → Git**
+   - Repository: `https://github.com/islamel-sayed96/shehab-wedding.git`
+   - Branch: `main`، و Directory: سيبه فاضي (يعني `public_html`، ولازم يكون فاضي قبل أول مرة)
+   - Create، وبعدين **Deploy**. وفعّل **Auto Deployment** عشان أي تعديل على GitHub ينزل لوحده.
+2. **File Manager → public_html/api**: انسخ `config.sample.php` باسم `config.php`، وغيّر `admin_key` لكلمة سر طويلة (١٢ حرف على الأقل).
+3. **SSL**: من hPanel فعّل SSL للدومين و Force HTTPS.
+4. صفحة المتابعة: `https://الدومين/api/admin.php?key=كلمة_السر`
+   فيها إجمالي الحضور، مين جاي ومين معتذر، كل الرسايل، إخفاء أو حذف أي رسالة، وتحميل الردود Excel.
+
+الردود متخزنة في `api/data/wishes.json` على السيرفر (مش بيترفع على GitHub، ومفيش حد يقدر يفتحه من المتصفح).
+
+لو نقلت الموقع لدومين جديد، غيّر اللينكات في أول `index.html` (`og:url` و `og:image` و `canonical`) للدومين الجديد عشان صورة المعاينة تظهر.

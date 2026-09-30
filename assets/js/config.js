@@ -17,8 +17,10 @@ const CONFIG = {
   venueAddress: "شارع مصطفى كامل، بعد قسم ثالث المنتزه، أمام شارع الملك",
   mapUrl: "https://www.google.com/maps/search/?api=1&query=Hayat+Banquet+Halls",
   mapEmbed: "https://www.google.com/maps?q=Hayat+Banquet+Halls&output=embed",
-  // الإيميل اللي هتوصله ردود الضيوف ورسائلهم (عن طريق خدمة FormSubmit المجانية).
-  // أول رد هيوصلك إيميل تفعيل من FormSubmit، اضغط Activate مرة واحدة بس.
+  // ملف حفظ الردود ورسائل التهنئة على استضافة PHP (هوستنجر). الرسائل بتظهر في قسم «رسائل التهنئة».
+  // متابعة الحضور والأعداد: api/admin.php?key=كلمة_السر (شوف README).
+  wishesApi: "api/wishes.php",
+  // احتياطي: لو الاستضافة مش شغالة (زي GitHub Pages)، الردود بتتبعت على الإيميل ده عن طريق FormSubmit.
   rsvpEmail: "Shehabahmed123@icloud.com",
   // رقم واتساب احتياطي بالصيغة الدولية بدون + (يُستخدم لو الإيميل مش متسجل أو الإرسال فشل)
   whatsapp: "",

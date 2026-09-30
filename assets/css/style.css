@@ -360,6 +360,28 @@
   @keyframes draw { to { stroke-dashoffset: 0; } }
   .rsvp-done p { margin: 0 0 6px; }
 
+  .hint { font-size: 13px; color: var(--ink-dim); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  /* Wishes wall */
+  .wish-list { list-style: none; margin: 26px auto 0; padding: 0; max-width: 520px; display: grid; gap: 16px; text-align: start; }
+  .wish {
+    position: relative; padding: 18px 20px 14px; border-radius: 4px 18px 4px 18px;
+    background: var(--grain), var(--paper);
+    box-shadow: 0 16px 30px -22px rgba(120,70,20,.6), inset 0 0 0 1px rgba(200,162,94,.45);
+    animation: wishIn .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s);
+  }
+  .wish::before { content: "“"; position: absolute; top: -6px; inset-inline-start: 14px; font-family: var(--f-latin); font-size: 64px; line-height: 1; color: var(--gold); opacity: .55; }
+  .wish p { margin: 6px 0 10px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink); line-height: 1.8; }
+  .wish footer { all: unset; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; border-top: 1px dashed rgba(200,162,94,.5); padding-top: 8px; }
+  .wish b { color: var(--caramel-lo); font-size: 17px; }
+  .wish b::before { content: "— "; color: var(--gold); }
+  .wish time { font-size: 13px; color: var(--ink-dim); }
+  .wish.new { box-shadow: 0 16px 30px -22px rgba(120,70,20,.6), inset 0 0 0 1.5px var(--caramel); }
+  @keyframes wishIn { from { opacity: 0; transform: translateY(16px) scale(.98); } }
+  .wish-empty { color: var(--ink-dim); margin-top: 18px; }
+  #wishMore { margin-top: 18px; }
+
   /* Closing */
   .closing .dua { font-family: var(--f-display); font-size: clamp(26px, 7vw, 34px); line-height: 1.7; text-wrap: balance; margin: 0; }
   .hashtag { font-family: var(--f-latin); font-style: italic; font-size: 22px; color: var(--sage); direction: ltr; margin-top: 16px; }

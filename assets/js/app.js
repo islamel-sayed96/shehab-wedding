@@ -233,6 +233,72 @@
   }
   tick();
 
+  /* ════════ Wishes wall: messages saved by api/wishes.php and shown on the page ════════ */
+  const Wishes = (() => {
+    const sec = $("#wishes"), list = $("#wishList"), more = $("#wishMore"), empty = $("#wishEmpty");
+    const PAGE = 6;
+    let items = [], shown = PAGE, ready = false;
+    const rtf = new Intl.RelativeTimeFormat("ar-EG", { numeric: "auto" });
+    function ago(t) {
+      const s = Math.round(t - Date.now() / 1000), a = Math.abs(s);
+      if (a < 60) return "الآن";
+      if (a < 3600) return rtf.format(Math.round(s / 60), "minute");
+      if (a < 86400) return rtf.format(Math.round(s / 3600), "hour");
+      if (a < 86400 * 30) return rtf.format(Math.round(s / 86400), "day");
+      return fmt({ day: "numeric", month: "long" }, new Date(t * 1000));
+    }
+    function card(it, i) {
+      const li = document.createElement("li");
+      li.className = "wish" + (it.fresh ? " new" : "");
+      li.style.setProperty("--d", (Math.min(i, 8) * .07) + "s");
+      const p = document.createElement("p"); p.textContent = it.message;
+      const f = document.createElement("footer");
+      const b = document.createElement("b"); b.textContent = it.name;
+      const tm = document.createElement("time"); tm.dateTime = new Date(it.time * 1000).toISOString(); tm.textContent = ago(it.time);
+      f.append(b, tm); li.append(p, f);
+      return li;
+    }
+    function render() {
+      list.replaceChildren(...items.slice(0, shown).map(card));
+      empty.hidden = items.length > 0;
+      more.hidden = items.length <= shown;
+    }
+    more.addEventListener("click", () => { shown += PAGE; render(); });
+    async function request(opts = {}) {
+      const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 10000);
+      try {
+        const res = await fetch(CONFIG.wishesApi, { cache: "no-store", ...opts, signal: ctrl.signal,
+          headers: { Accept: "application/json", ...(opts.body ? { "Content-Type": "application/json" } : {}) } });
+        const data = await res.json().catch(() => null);
+        if (res.status === 422) throw new Error("name");
+        if (res.status === 429) throw new Error("rate");
+        if (!res.ok || !data || !data.ok) throw new Error("server");
+        return data;
+      } finally { clearTimeout(timer); }
+    }
+    async function load() {
+      // On a host without PHP (e.g. GitHub Pages) this fails quietly and the section stays hidden.
+      if (!CONFIG.wishesApi) return;
+      try {
+        const data = await request();
+        items = Array.isArray(data.items) ? data.items : [];
+        ready = true;
+        sec.hidden = false; $("#msgHint").hidden = false;
+        render();
+      } catch (e) { /* stay hidden */ }
+    }
+    return {
+      load,
+      async post(body) { return (await request({ method: "POST", body: JSON.stringify(body) })).item; },
+      add(item) {
+        items = [{ ...item, fresh: true }, ...items.filter(x => x.id !== item.id)];
+        render();
+      },
+      get ready() { return ready; }
+    };
+  })();
+  Wishes.load();
+
   /* ════════ RSVP → email (FormSubmit), WhatsApp as a fallback ════════ */
   const form = $("#rsvpForm");
   const attending = () => $("#attYes").checked;
@@ -259,7 +325,7 @@
     const waText = [`تأكيد حضور زفاف ${CONFIG.groom} و${CONFIG.bride}`, `الاسم: ${name}`,
       yes ? `الحضور: سأحضر بإذن الله (${count})` : "الحضور: أعتذر عن الحضور", msg && `رسالة: ${msg}`].filter(Boolean).join("\n");
 
-    if (!CONFIG.rsvpEmail) {
+    if (!Wishes.ready && !CONFIG.rsvpEmail) {
       if (CONFIG.whatsapp) return showDone(name, yes, false, waText);
       return err("استقبال الردود لم يُفعَّل بعد، جرّب لاحقاً.");
     }
@@ -275,10 +341,27 @@
       "رسالة للعروسين": msg || "—"
     };
     try {
-      await sendRsvp(payload);
+      let item = null;
+      if (Wishes.ready) {
+        try {
+          item = await Wishes.post({ name, attend: yes ? "yes" : "no", guests: yes ? +$("#gCount").value : 0, message: msg, website: $("#gSite").value });
+        } catch (e3) {
+          // Server unreachable: fall back to email so the reply is not lost.
+          if (e3.message === "name" || e3.message === "rate" || !CONFIG.rsvpEmail) throw e3;
+          await sendRsvp(payload);
+        }
+      } else {
+        await sendRsvp(payload);
+      }
       showDone(name, yes, true);
+      if (item) {
+        Wishes.add(item);
+        $("#rsvpThanks").textContent += " ورسالتك ظهرت في «رسائل التهنئة».";
+      }
     } catch (e2) {
-      if (CONFIG.whatsapp) showDone(name, yes, false, waText);
+      if (e2.message === "name") { err("من فضلك اكتب اسمك (حرفين على الأقل)"); $("#gName").focus(); }
+      else if (e2.message === "rate") err("اتبعت ردود كتير من الجهاز ده، استنى شوية وجرّب تاني.");
+      else if (CONFIG.whatsapp) showDone(name, yes, false, waText);
       else err(/activat/i.test(e2.message || "")
         ? "استقبال الردود لسه بيتفعّل، جرّب تاني بعد شوية."
         : "تعذّر الإرسال الآن. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.");
@@ -292,7 +375,8 @@
   // If it times out or the network call itself fails, post a plain form into a hidden
   // frame instead: that path needs no reply, so the guest isn't kept waiting.
   async function sendRsvp(payload) {
-    const email = CONFIG.rsvpEmail.trim();
+    const email = (CONFIG.rsvpEmail || "").trim();
+    if (!email) throw new Error("no email");
     const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 10000);
     let res;
     try {
