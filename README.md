@@ -31,7 +31,7 @@
 ## النشر على GitHub Pages
 
 Settings ← Pages ← Deploy from a branch ← `main` و `/ (root)` ← Save.
-اللينك: `https://islamel-sayed96.github.io/shehab-wedding/`
+اللينك: `https://islamel-sayed96.github.io/shehab-wedding/` (نسخة تجريبية، الموقع الأساسي: `https://shehab-rahma.online/`)
 
 ## مشاركة اللينك
 
@@ -39,7 +39,7 @@ Settings ← Pages ← Deploy from a branch ← `main` و `/ (root)` ← Save.
 واتساب بيحفظ المعاينة، فلو بعت اللينك قبل كده وظهر من غير صورة، ابعته المرة دي كده عشان يعيد القراءة:
 
 ```
-https://islamel-sayed96.github.io/shehab-wedding/?v=2
+https://shehab-rahma.online/?v=2
 ```
 
 ## الرفع على هوستنجر
