@@ -14,9 +14,9 @@ const CONFIG = {
   rsvpBy: "2026-10-12T00:00:00+03:00",
   venueName: "قاعات حياة للحفلات",
   venueNameEn: "Hayat Banquet Halls",
-  venueAddress: "شارع مصطفى كامل، بعد قسم ثالث المنتزه، أمام شارع الملك",
-  mapUrl: "https://www.google.com/maps/search/?api=1&query=Hayat+Banquet+Halls",
-  mapEmbed: "https://www.google.com/maps?q=Hayat+Banquet+Halls&output=embed",
+  venueAddress: "شارع مصطفى كامل، بعد قسم ثالث المنتزه، أمام شارع الملك، الإسكندرية",
+  mapUrl: "https://www.google.com/maps/search/?api=1&query=Hayat+Banquet+Halls%2C+Mostafa+Kamel+St%2C+Montaza%2C+Alexandria%2C+Egypt",
+  mapEmbed: "https://www.google.com/maps?q=Hayat+Banquet+Halls%2C+Mostafa+Kamel+St%2C+Montaza%2C+Alexandria%2C+Egypt&hl=ar&z=16&output=embed",
   // ملف حفظ الردود ورسائل التهنئة على استضافة PHP (هوستنجر). الرسائل بتظهر في قسم «رسائل التهنئة».
   // متابعة الحضور والأعداد: api/admin.php?key=كلمة_السر (شوف README).
   wishesApi: "api/wishes.php",
