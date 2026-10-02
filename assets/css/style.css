@@ -363,21 +363,11 @@
   .hint { font-size: 13px; color: var(--ink-dim); }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 
-  /* Dress code */
-  .dress { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 520px; margin: 26px auto 0; }
-  .dress-card {
-    display: grid; justify-items: center; gap: 2px; padding: 22px 12px 18px;
-    background: var(--grain), var(--paper); border-radius: 80px 80px 10px 10px;
-    box-shadow: 0 18px 32px -22px rgba(120,70,20,.6), inset 0 0 0 1px rgba(200,162,94,.55), inset 0 0 0 6px var(--paper), inset 0 0 0 7px rgba(200,162,94,.3);
-  }
-  .dress-ico { width: 54px; height: 54px; color: var(--caramel); margin-bottom: 6px; }
-  .dress-card .who { font-size: 15px; color: var(--sage); }
-  .dress-card .who small { font-family: var(--f-latin); letter-spacing: .25em; text-transform: uppercase; font-size: 11px; padding-inline-start: 4px; }
-  .dress-card strong { font-size: 21px; color: var(--caramel-lo); line-height: 1.6; }
-  .dress-card .en { font-family: var(--f-latin); font-size: 17px; color: var(--ink-dim); direction: ltr; }
-  .swatches { display: flex; gap: 6px; margin-top: 10px; }
-  .swatches i { width: 16px; height: 16px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px rgba(200,162,94,.6); }
-  @media (max-width: 360px) { .dress { grid-template-columns: 1fr; } }
+  /* Dress code: short and quiet, like the printed card */
+  .sec.dress { padding-block: 30px; }
+  .dress-line { margin: 8px 0 0; font-size: 18px; color: var(--ink); line-height: 1.6; }
+  .dress-line b { color: var(--caramel); font-weight: 700; }
+  .dress-line span { display: block; font-family: var(--f-latin); font-size: 16px; color: var(--ink-dim); direction: ltr; }
 
   /* Wishes wall */
   .wish-list { list-style: none; margin: 26px auto 0; padding: 0; max-width: 520px; display: grid; gap: 16px; text-align: start; }
