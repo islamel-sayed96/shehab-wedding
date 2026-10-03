@@ -1,5 +1,5 @@
 # Only the two endpoints are reachable; config, helpers and stored data are not.
-<FilesMatch "^(lib|config|config\.sample)\.php$">
+<FilesMatch "^(lib|config|config\.sample|settings)\.php$">
   Require all denied
 </FilesMatch>
 Options -Indexes

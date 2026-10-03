@@ -1,6 +1,7 @@
 <?php
 // GET  → public wishes (name + message), newest first.
-// POST → save an RSVP. Attendance stays private (see admin.php); the message is shown on the site.
+// POST → save an RSVP. The message is shown on the site; attendance stays private (admin.php)
+//        and is emailed with the running head count (settings.php → notify_email).
 declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
@@ -48,7 +49,7 @@ try {
         foreach ($db['entries'] as $i => $e) {
             if (($e['who'] ?? '') === $who && $e['name'] === $name && $now - $e['time'] < 3600) {
                 $db['entries'][$i] = ['attend' => $attend, 'guests' => $guests, 'message' => $message ?: $e['message']] + $e;
-                return ['entry' => $db['entries'][$i]];
+                return ['entry' => $db['entries'][$i], 'updated' => true, 'totals' => totals($db['entries'])];
             }
         }
         $entry = [
@@ -56,7 +57,7 @@ try {
             'attend' => $attend, 'guests' => $guests, 'who' => $who, 'hidden' => false,
         ];
         $db['entries'][] = $entry;
-        return ['entry' => $entry];
+        return ['entry' => $entry, 'updated' => false, 'totals' => totals($db['entries'])];
     });
 } catch (Throwable $t) {
     json_out(['ok' => false, 'error' => 'storage'], 500);
@@ -64,4 +65,7 @@ try {
 
 if (!empty($out['limited'])) json_out(['ok' => false, 'error' => 'rate'], 429);
 $e = $out['entry'];
-json_out(['ok' => true, 'item' => ($e['message'] !== '' && empty($e['hidden'])) ? public_entry($e) : null]);
+respond_then(
+    ['ok' => true, 'item' => ($e['message'] !== '' && empty($e['hidden'])) ? public_entry($e) : null],
+    fn() => notify_rsvp($e, $out['totals'], $out['updated'])
+);
