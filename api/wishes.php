@@ -1,5 +1,5 @@
 <?php
-// GET  → public wishes (name + message), newest first.
+// GET  → public replies (name, attending, head count, message) and totals, newest first.
 // POST → save an RSVP. The message is shown on the site; attendance stays private (admin.php)
 //        and is emailed with the running head count (settings.php → notify_email).
 declare(strict_types=1);
@@ -8,13 +8,10 @@ require __DIR__ . '/lib.php';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if ($method === 'GET') {
-    $items = [];
-    foreach (array_reverse(read_store()['entries']) as $e) {
-        if (!empty($e['hidden']) || ($e['message'] ?? '') === '') continue;
-        $items[] = public_entry($e);
-        if (count($items) >= 300) break;
-    }
-    json_out(['ok' => true, 'items' => $items]);
+    // Every visible reply (with or without a message), plus the head count, newest first.
+    $visible = array_values(array_filter(read_store()['entries'], fn($e) => empty($e['hidden'])));
+    $items = array_map('public_entry', array_slice(array_reverse($visible), 0, 500));
+    json_out(['ok' => true, 'items' => $items, 'totals' => totals($visible)]);
 }
 
 if ($method !== 'POST') json_out(['ok' => false, 'error' => 'method'], 405);
@@ -66,6 +63,6 @@ try {
 if (!empty($out['limited'])) json_out(['ok' => false, 'error' => 'rate'], 429);
 $e = $out['entry'];
 respond_then(
-    ['ok' => true, 'item' => ($e['message'] !== '' && empty($e['hidden'])) ? public_entry($e) : null],
+    ['ok' => true, 'item' => empty($e['hidden']) ? public_entry($e) : null, 'totals' => $out['totals']],
     fn() => notify_rsvp($e, $out['totals'], $out['updated'])
 );

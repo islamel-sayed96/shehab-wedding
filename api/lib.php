@@ -76,7 +76,8 @@ function clean(string $s, int $max): string
 
 function public_entry(array $e): array
 {
-    return ['id' => $e['id'], 'name' => $e['name'], 'message' => $e['message'], 'time' => $e['time']];
+    return ['id' => $e['id'], 'name' => $e['name'], 'message' => $e['message'], 'time' => $e['time'],
+        'attend' => $e['attend'], 'guests' => (int) $e['guests']];
 }
 
 function admin_key(): ?string

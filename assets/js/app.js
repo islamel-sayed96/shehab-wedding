@@ -247,21 +247,47 @@
       if (a < 86400 * 30) return rtf.format(Math.round(s / 86400), "day");
       return fmt({ day: "numeric", month: "long" }, new Date(t * 1000));
     }
+    function people(n) {
+      n = +n || 1;
+      if (n === 1) return "شخص واحد";
+      if (n === 2) return "شخصان";
+      return `${nf.format(n)} ${n <= 10 ? "أشخاص" : "شخص"}`;
+    }
+    function summary() {
+      let heads = 0, coming = 0, declined = 0;
+      items.forEach(it => { if (it.attend === "no") declined++; else { coming++; heads += +it.guests || 1; } });
+      const el = $("#wishTotals");
+      if (!items.length) { el.hidden = true; return; }
+      el.hidden = false;
+      el.innerHTML = "";
+      [[heads, "إجمالي الحضور"], [coming, "أكدوا الحضور"], [declined, "اعتذروا"]].forEach(([n, l]) => {
+        const d = document.createElement("div"); d.className = "tot";
+        const b = document.createElement("b"); b.textContent = nf.format(n);
+        d.append(b, l); el.appendChild(d);
+      });
+    }
     function card(it, i) {
       const li = document.createElement("li");
       li.className = "wish" + (it.fresh ? " new" : "");
       li.style.setProperty("--d", (Math.min(i, 8) * .07) + "s");
-      const p = document.createElement("p"); p.textContent = it.message;
+      if (!it.message) li.classList.add("bare");
+      const badge = document.createElement("span");
+      const coming = it.attend !== "no";
+      badge.className = "rsvp-badge " + (coming ? "yes" : "no");
+      badge.textContent = coming ? `سيحضر · ${people(it.guests || 1)}` : "اعتذر عن الحضور";
       const f = document.createElement("footer");
       const b = document.createElement("b"); b.textContent = it.name;
       const tm = document.createElement("time"); tm.dateTime = new Date(it.time * 1000).toISOString(); tm.textContent = ago(it.time);
-      f.append(b, tm); li.append(p, f);
+      f.append(b, tm);
+      if (it.message) { const p = document.createElement("p"); p.textContent = it.message; li.append(badge, p, f); }
+      else li.append(badge, f);
       return li;
     }
     function render() {
       list.replaceChildren(...items.slice(0, shown).map(card));
       empty.hidden = items.length > 0;
       more.hidden = items.length <= shown;
+      summary();
     }
     more.addEventListener("click", () => { shown += PAGE; render(); });
     async function request(opts = {}) {
@@ -356,7 +382,7 @@
       showDone(name, yes, true);
       if (item) {
         Wishes.add(item);
-        $("#rsvpThanks").textContent += " ورسالتك ظهرت في «رسائل التهنئة».";
+        $("#rsvpThanks").textContent += " وردك ظهر في «رسائل التهنئة».";
       }
     } catch (e2) {
       if (e2.message === "name") { err("من فضلك اكتب اسمك (حرفين على الأقل)"); $("#gName").focus(); }

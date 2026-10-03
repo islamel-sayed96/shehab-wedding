@@ -385,6 +385,15 @@
   .wish.new { box-shadow: 0 16px 30px -22px rgba(120,70,20,.6), inset 0 0 0 1.5px var(--caramel); }
   @keyframes wishIn { from { opacity: 0; transform: translateY(16px) scale(.98); } }
   .wish-empty { color: var(--ink-dim); margin-top: 18px; }
+  .wish-totals { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 18px auto 0; }
+  .wish-totals .tot { min-width: 96px; padding: 10px 14px; border-radius: 14px; background: var(--grain), var(--paper); box-shadow: inset 0 0 0 1px rgba(200,162,94,.55); font-size: 14px; color: var(--ink-dim); }
+  .wish-totals .tot b { display: block; font-size: 28px; line-height: 1.2; color: var(--caramel); font-variant-numeric: tabular-nums; }
+  .rsvp-badge { display: inline-block; font-size: 13px; padding: 2px 10px; border-radius: 999px; margin-top: 2px; }
+  .rsvp-badge.yes { background: rgba(123,134,81,.14); color: var(--sage); box-shadow: inset 0 0 0 1px rgba(123,134,81,.35); }
+  .rsvp-badge.no { background: rgba(183,119,58,.1); color: var(--caramel-lo); box-shadow: inset 0 0 0 1px rgba(183,119,58,.3); }
+  .wish.bare { padding-block: 12px 10px; }
+  .wish.bare::before { display: none; }
+  .wish.bare footer { border-top: 0; padding-top: 6px; }
   #wishMore { margin-top: 18px; }
 
   /* Closing */
